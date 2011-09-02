@@ -17,6 +17,11 @@ protocol = Thrift::BinaryProtocol.new transport
 client = Scribe::Client.new protocol
 transport.open
 
+# 2011/09/02 Kazuki Ohta <kazuki.ohta@gmail.com>
+# explicitly specify TCP_NODELAY for low-latency communication.
+raw_sock = socket.to_io
+raw_sock.setsockopt Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1
+
 entry = LogEntry.new
 entry.category = 'hoge'
 entry.message = 'fuga'
