@@ -43,7 +43,7 @@ class ScribeInput < Input
     if tag = conf['tag']
       @tag = tag
     else
-      raise ConfigError, "tail: 'tag' parameter is required on scribe input"
+      raise ConfigError, "in_scribe: 'tag' parameter is required on scribe input"
     end
 
     @server_type = conf['server_type'] || 'nonblocking'
@@ -72,7 +72,7 @@ class ScribeInput < Input
     when 'nonblocking'
       @server = Thrift::NonblockingServer.new processor, @transport, transport_factory
     else
-      raise ConfigError, "scribe: unsupported server_type '#{@server_type}'"
+      raise ConfigError, "in_scribe: unsupported server_type '#{@server_type}'"
     end
     @server.serve
   end
