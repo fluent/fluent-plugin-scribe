@@ -46,6 +46,8 @@ class ScribeInput < Input
       raise ConfigError, "tail: 'tag' parameter is required on scribe input"
     end
 
+    @server_type = conf['server_type'] || 'nonblocking'
+
     if body_size_limit = conf['body_size_limit']
       @body_size_limit = Config.size_value(body_size_limit)
     end
@@ -60,8 +62,18 @@ class ScribeInput < Input
     @transport = Thrift::ServerSocket.new @host, @port
     transport_factory = Thrift::FramedTransportFactory.new
 
-    # @server = Thrift::ThreadPoolServer.new processor, @transport, transport_factory
-    @server = Thrift::NonblockingServer.new processor, @transport, transport_factory
+    case @server_type
+    when 'simple'
+      @server = Thrift::SimpleServer.new processor, @transport, transport_factory
+    when 'threaded'
+      @server = Thrift::ThreadedServer.new processor, @transport, transport_factory
+    when 'thread_pool'
+      @server = Thrift::ThreadPoolServer.new processor, @transport, transport_factory
+    when 'nonblocking'
+      @server = Thrift::NonblockingServer.new processor, @transport, transport_factory
+    else
+      raise ConfigError, "scribe: unsupported server_type '#{@server_type}'"
+    end
     @server.serve
   end
 
