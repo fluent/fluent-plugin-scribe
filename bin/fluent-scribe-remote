@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+require 'thrift'
+$:.unshift File.join(File.dirname(__FILE__), '../lib/fluent/plugin/thrift')
+require 'fb303_types'
+require 'fb303_constants'
+require 'facebook_service'
+require 'scribe_types'
+require 'scribe_constants'
+require 'scribe'
+
+host = 'localhost'
+port = 1463
+
+socket = Thrift::Socket.new host, port.to_i
+transport = Thrift::FramedTransport.new socket
+protocol = Thrift::BinaryProtocol.new transport
+client = Scribe::Client.new protocol
+transport.open
+
+entry = LogEntry.new
+entry.category = 'hoge'
+entry.message = 'fuga'
+p client.Log([entry])
+
+transport.close
