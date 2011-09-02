@@ -46,7 +46,7 @@ class ScribeInput < Input
       raise ConfigError, "in_scribe: 'tag' parameter is required on scribe input"
     end
 
-    @server_type = conf['server_type'] || 'nonblocking'
+    @server_type = conf['server_type'] || 'thread_pool'
 
     if body_size_limit = conf['body_size_limit']
       @body_size_limit = Config.size_value(body_size_limit)
