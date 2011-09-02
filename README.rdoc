@@ -1,7 +1,50 @@
 = Scribe output plugin for Fluent
 
+== Overview
+
+This is a plugin for fluent[https://github.com/fluent] event collector. This plugin adds the Scribe[https://github.com/facebook/scribe] compatible interface to fluent.
+
+== What's Scribe?
+
+Scribe[https://github.com/facebook/scribe] is a server for aggregating log data streamed in real time from a large number of servers, developed at Facebook.
+
+It uses Thrift[http://thrift.apache.org/], cross-language RPC framework, to communicate between clients and servers.
+
+== What's Scribe plugin for fluent?
+
+The Scribe plugin for fluent enables fluent daemon, to talk the Scribe protocol by using Thrift. The following shows the protocol itself, in thrift-idl format:
+
+  enum ResultCode
+  {
+    OK,
+    TRY_LATER
+  }
+  
+  struct LogEntry
+  {
+    1:  string category,
+    2:  string message
+  }
+  
+  service scribe extends fb303.FacebookService
+  {
+    ResultCode Log(1: list<LogEntry> messages);
+  }
+
+== How to use?
+
+Install this plugin with fluent, and add the following configuration to fluent.conf.
+
+  # Scribe input
+  <source>
+    type scribe
+    port 1463
+    tag debug.aiueo
+  </source>
+
+You can modify port, and the corresponding tag.
+
 == Copyright
 
 Copyright:: Copyright (c) 2011 Treasure Data, Inc.
 License::   Apache License, Version 2.0
-
