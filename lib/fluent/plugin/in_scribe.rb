@@ -47,6 +47,7 @@ class ScribeInput < Input
     end
 
     @server_type = conf['server_type'] || 'thread_pool'
+    @is_framed = conf['framed'].to_s != "false"
 
     if body_size_limit = conf['body_size_limit']
       @body_size_limit = Config.size_value(body_size_limit)
@@ -60,7 +61,11 @@ class ScribeInput < Input
     processor = Scribe::Processor.new handler
 
     @transport = Thrift::ServerSocket.new @host, @port
-    transport_factory = Thrift::FramedTransportFactory.new
+    if @is_framed
+      transport_factory = Thrift::FramedTransportFactory.new
+    else
+      transport_factory = Thrift::BufferedTransportFactory.new
+    end
 
     case @server_type
     when 'simple'
