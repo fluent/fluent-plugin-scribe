@@ -79,14 +79,16 @@ class ScribeInput < Input
     else
       raise ConfigError, "in_scribe: unsupported server_type '#{@server_type}'"
     end
-    @server.serve
+    @thread = Thread.new(&method(:run))
   end
 
   def shutdown
     @transport.close unless @transport.closed?
+    #@thread.join # TODO
   end
 
   def run
+    @server.serve
   rescue
     $log.error "unexpected error", :error=>$!.to_s
     $log.error_backtrace
