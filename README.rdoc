@@ -1,4 +1,4 @@
-= Scribe output plugin for Fluent
+= Scribe input plugin for Fluent
 
 == Overview
 
