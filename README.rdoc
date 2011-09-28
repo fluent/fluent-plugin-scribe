@@ -46,7 +46,7 @@ You can modify port, and the corresponding tag.
 
 == Contributors
 
-* Satoshi Tagomori[https://github.com/tagomoris]
+* {Satoshi Tagomori}[https://github.com/tagomoris]
 
 == Copyright
 
