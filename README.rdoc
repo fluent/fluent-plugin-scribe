@@ -44,6 +44,13 @@ Install this plugin with fluent, and add the following configuration to fluent.c
 
 You can modify port, and the corresponding tag.
 
+== For Developers
+
+To test this plugin, please execute the following command in your 'fluent' project directory, not scribe input plugin directory.
+
+  $ export SCRIBE_PLUGIN_DIR=../fluent-plugin-scribe                                                                   
+  $ FLUENT_PLUGIN=$SCRIBE_PLUGIN_DIR/lib/fluent/plugin/ ./bin/fluentd --config $SCRIBE_PLUGIN_DIR/example.conf -v -v -v
+
 == Contributors
 
 * {Satoshi Tagomori}[https://github.com/tagomoris]
