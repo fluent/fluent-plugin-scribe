@@ -13,7 +13,7 @@ port = 1463
 
 socket = Thrift::Socket.new host, port.to_i
 transport = Thrift::FramedTransport.new socket
-protocol = Thrift::BinaryProtocol.new transport
+protocol = Thrift::BinaryProtocol.new transport, false, false
 client = Scribe::Client.new protocol
 transport.open
 
