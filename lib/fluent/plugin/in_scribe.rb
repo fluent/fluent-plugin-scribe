@@ -67,15 +67,22 @@ class ScribeInput < Input
       transport_factory = Thrift::BufferedTransportFactory.new
     end
 
+    protocol_factory = Thrift::BinaryProtocolFactory.new
+    protocol_factory.instance_eval {|obj|
+      def get_protocol(trans) # override
+        return Thrift::BinaryProtocol.new(trans, false, false)
+      end
+    }
+
     case @server_type
     when 'simple'
-      @server = Thrift::SimpleServer.new processor, @transport, transport_factory
+      @server = Thrift::SimpleServer.new processor, @transport, transport_factory, protocol_factory
     when 'threaded'
-      @server = Thrift::ThreadedServer.new processor, @transport, transport_factory
+      @server = Thrift::ThreadedServer.new processor, @transport, transport_factory, protocol_factory
     when 'thread_pool'
-      @server = Thrift::ThreadPoolServer.new processor, @transport, transport_factory
+      @server = Thrift::ThreadPoolServer.new processor, @transport, transport_factory, protocol_factory
     when 'nonblocking'
-      @server = Thrift::NonblockingServer.new processor, @transport, transport_factory
+      @server = Thrift::NonblockingServer.new processor, @transport, transport_factory, protocol_factory
     else
       raise ConfigError, "in_scribe: unsupported server_type '#{@server_type}'"
     end
