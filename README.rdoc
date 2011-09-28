@@ -44,6 +44,10 @@ Install this plugin with fluent, and add the following configuration to fluent.c
 
 You can modify port, and the corresponding tag.
 
+== Contributors
+
+* Satoshi Tagomori[https://github.com/tagomoris]
+
 == Copyright
 
 Copyright:: Copyright (c) 2011 Treasure Data, Inc.
