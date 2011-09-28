@@ -31,18 +31,24 @@ The Scribe plugin for fluent enables fluent daemon, to talk the Scribe protocol 
     ResultCode Log(1: list<LogEntry> messages);
   }
 
+The category field is used as fluent 'tag'.
+
 == How to use?
 
-Install this plugin with fluent, and add the following configuration to fluent.conf.
+To use this plugin with fluent, please add the following configuration to fluent.conf.
 
   # Scribe input
   <source>
     type scribe
     port 1463
-    tag debug.aiueo
   </source>
 
-You can modify port, and the corresponding tag.
+The following options are supported.
+
+* port: port number (default: 1463)
+* bind: bind address (default: 0.0.0.0)
+* server_type: server architecture either in 'simple', 'threaded', 'thread_pool', 'nonblocking' (default: thread_pool)
+* framed: use framed protocol or not (default: true)
 
 == For Developers
 
