@@ -40,11 +40,6 @@ class ScribeInput < Input
     @port = conf['port'] || @port
     @port = @port.to_i
     @bind = conf['bind'] || @bind
-    if tag = conf['tag']
-      @tag = tag
-    else
-      raise ConfigError, "in_scribe: 'tag' parameter is required on scribe input"
-    end
 
     @server_type = conf['server_type'] || 'thread_pool'
     @is_framed = conf['framed'].to_s != "false"
@@ -57,7 +52,7 @@ class ScribeInput < Input
   def start
     $log.debug "listening scribe on #{@bind}:#{@port}"
 
-    handler = FluentScribeHandler.new @tag
+    handler = FluentScribeHandler.new
     processor = Scribe::Processor.new handler
 
     @transport = Thrift::ServerSocket.new @host, @port
@@ -108,18 +103,13 @@ class ScribeInput < Input
   end
 
   class FluentScribeHandler
-    def initialize(tag)
-      @tag = tag
-    end
-
     def Log(msgs)
       begin
         msgs.each { |msg|
           event = Event.new(Engine.now, {
-            'category' => msg.category,
             'message' => msg.message
           })
-          Engine.emit(@tag, event)
+          Engine.emit(msg.category, event)
         }
         return ResultCode::OK
       rescue => e

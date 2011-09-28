@@ -23,7 +23,7 @@ raw_sock = socket.to_io
 raw_sock.setsockopt Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1
 
 entry = LogEntry.new
-entry.category = 'hoge'
+entry.category = 'debug.hoge'
 entry.message = 'fuga'
 p client.Log([entry])
 

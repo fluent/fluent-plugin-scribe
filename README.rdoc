@@ -51,6 +51,10 @@ To test this plugin, please execute the following command in your 'fluent' proje
   $ export SCRIBE_PLUGIN_DIR=../fluent-plugin-scribe                                                                   
   $ FLUENT_PLUGIN=$SCRIBE_PLUGIN_DIR/lib/fluent/plugin/ ./bin/fluentd --config $SCRIBE_PLUGIN_DIR/example.conf -v -v -v
 
+Then please execute the sample client.
+
+  $ ./bin/fluent-scribe-remote
+
 == Contributors
 
 * {Satoshi Tagomori}[https://github.com/tagomoris]
