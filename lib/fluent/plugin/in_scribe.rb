@@ -67,10 +67,16 @@ class ScribeInput < Input
       transport_factory = Thrift::BufferedTransportFactory.new
     end
 
+    # 2011/09/29 Kazuki Ohta <kazuki.ohta@gmail.com>
+    # This section is a workaround to set strict_read and strict_write option.
+    # Ruby-Thrift 0.7 set them both 'true' in default, but Scribe protocol set
+    # them both 'false'.
     protocol_factory = Thrift::BinaryProtocolFactory.new
     protocol_factory.instance_eval {|obj|
       def get_protocol(trans) # override
-        return Thrift::BinaryProtocol.new(trans, false, false)
+        return Thrift::BinaryProtocol.new(trans,
+                                          strict_read=false,
+                                          strict_write=false)
       end
     }
 
