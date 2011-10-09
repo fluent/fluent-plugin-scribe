@@ -47,7 +47,7 @@ The following options are supported.
 
 * port: port number (default: 1463)
 * bind: bind address (default: 0.0.0.0)
-* server_type: server architecture either in 'simple', 'threaded', 'thread_pool', 'nonblocking' (default: thread_pool)
+* server_type: server architecture either in 'simple', 'threaded', 'thread_pool', 'nonblocking' (default: nonblocking)
 * framed: use framed protocol or not (default: true)
 
 == For Developers
