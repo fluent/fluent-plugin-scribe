@@ -41,7 +41,7 @@ class ScribeInput < Input
     @port = @port.to_i
     @bind = conf['bind'] || @bind
 
-    @server_type = conf['server_type'] || 'thread_pool'
+    @server_type = conf['server_type'] || 'nonblocking'
     @is_framed = conf['framed'].to_s != "false"
 
     if body_size_limit = conf['body_size_limit']
