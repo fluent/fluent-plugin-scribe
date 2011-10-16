@@ -21,6 +21,12 @@ module Fluent
 class ScribeInput < Input
   Plugin.register_input('scribe', self)
 
+  config_param :port,            :integer, :default => 1463
+  config_param :bind,            :string,  :default => '0.0.0.0'
+  config_param :server_type,     :string,  :default => 'nonblocking'
+  config_param :is_framed,       :bool,    :default => true
+  config_param :body_size_limit, :size,    :default => 32*1024*1024  # TODO default
+
   def initialize
     require 'thrift'
     $:.unshift File.join(File.dirname(__FILE__), 'thrift')
@@ -30,23 +36,11 @@ class ScribeInput < Input
     require 'scribe_types'
     require 'scribe_constants'
     require 'scribe'
-
-    @port = 1463
-    @bind = '0.0.0.0'
-    @body_size_limit = 32*1024*1024  # TODO default
+    super
   end
 
   def configure(conf)
-    @port = conf['port'] || @port
-    @port = @port.to_i
-    @bind = conf['bind'] || @bind
-
-    @server_type = conf['server_type'] || 'nonblocking'
-    @is_framed = conf['framed'].to_s != "false"
-
-    if body_size_limit = conf['body_size_limit']
-      @body_size_limit = Config.size_value(body_size_limit)
-    end
+    super
   end
 
   def start
