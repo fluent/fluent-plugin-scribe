@@ -109,7 +109,7 @@ class ScribeInput < Input
           record = {
             'message' => msg.message
           }
-          Engine.emit(msg.category, Engine.new, record)
+          Engine.emit(msg.category, Engine.now, record)
         }
         return ResultCode::OK
       rescue => e
