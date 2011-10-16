@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{fluent-plugin-scribe}
-  s.version = "0.10.0"
+  s.version = "0.10.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kazuki Ohta"]
@@ -29,12 +29,14 @@ Gem::Specification.new do |s|
     "lib/fluent/plugin/thrift/scribe.rb",
     "lib/fluent/plugin/thrift/scribe.thrift",
     "lib/fluent/plugin/thrift/scribe_constants.rb",
-    "lib/fluent/plugin/thrift/scribe_types.rb"
+    "lib/fluent/plugin/thrift/scribe_types.rb",
+    "test/plugin/in_scribe.rb"
   ]
   s.homepage = %q{https://github.com/fluent/fluent-plugin-scribe}
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.6.2}
   s.summary = %q{Scribe plugin for Fluent event collector}
+  s.test_files = ["test/plugin/in_scribe.rb"]
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
