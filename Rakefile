@@ -40,7 +40,7 @@ task "thrift_gen" do
 end
 
 Rake::TestTask.new(:test) do |t|
-  t.test_files = Dir['test/*_test.rb']
+  t.test_files = Dir['test/plugin/*.rb']
   t.ruby_opts = ['-rubygems'] if defined? Gem
   t.ruby_opts << '-I.'
 end
