@@ -2,17 +2,17 @@
 
 == Overview
 
-This is a plugin for fluent[https://github.com/fluent] event collector. This plugin adds the Scribe[https://github.com/facebook/scribe] compatible interface to fluent.
+This is a plugin for fluentd[https://github.com/fluentd] event collector. This plugin adds the Scribe[https://github.com/facebook/scribe] compatible interface to fluentd.
 
 == What's Scribe?
 
 Scribe[https://github.com/facebook/scribe] is a server for aggregating log data streamed in real time from a large number of servers, developed at Facebook.
 
-It uses Thrift[http://thrift.apache.org/], cross-language RPC framework, to communicate between clients and servers.
+It uses Thrift[http://thrift.apache.org/], a cross-language RPC framework, to communicate between clients and servers.
 
 == What's Scribe plugin for fluent?
 
-The Scribe plugin for fluent enables fluent daemon, to talk the Scribe protocol by using Thrift. The following shows the protocol itself, in thrift-idl format:
+The Scribe plugin for fluentd, which enables fluentd to talk the Scribe protocol. Scribe protocol is defined as follows, in Thrift-IDL format:
 
   enum ResultCode
   {
@@ -31,11 +31,11 @@ The Scribe plugin for fluent enables fluent daemon, to talk the Scribe protocol 
     ResultCode Log(1: list<LogEntry> messages);
   }
 
-The category field is used as fluent 'tag'.
+The category field is used as fluentd 'tag'.
 
 == How to use?
 
-To use this plugin with fluent, please add the following configuration to fluent.conf.
+Please add the following configurations to fluent.conf.
 
   # Scribe input
   <source>
@@ -43,7 +43,7 @@ To use this plugin with fluent, please add the following configuration to fluent
     port 1463
   </source>
 
-The following options are supported.
+These options are supported.
 
 * port: port number (default: 1463)
 * bind: bind address (default: 0.0.0.0)
@@ -64,6 +64,7 @@ Then please execute the sample client.
 == Contributors
 
 * {Satoshi Tagomori}[https://github.com/tagomoris]
+* {Sadayuki Furuhashi}[https://github.com/frsyuki]
 
 == Copyright
 
