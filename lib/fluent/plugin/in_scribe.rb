@@ -17,7 +17,6 @@
 #
 module Fluent
 
-
 class ScribeInput < Input
   Plugin.register_input('scribe', self)
 
@@ -49,7 +48,7 @@ class ScribeInput < Input
     handler = FluentScribeHandler.new
     processor = Scribe::Processor.new handler
 
-    @transport = Thrift::ServerSocket.new @host, @port
+    @transport = Thrift::ServerSocket.new @bind, @port
     if @is_framed
       transport_factory = Thrift::FramedTransportFactory.new
     else
@@ -115,6 +114,4 @@ class ScribeInput < Input
   end
 end
 
-
 end
-
