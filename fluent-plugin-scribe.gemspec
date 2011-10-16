@@ -5,11 +5,14 @@
 
 Gem::Specification.new do |s|
   s.name = %q{fluent-plugin-scribe}
-  s.version = "0.10.1"
+  s.version = "0.10.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kazuki Ohta"]
   s.date = %q{2011-10-16}
+  s.default_executable = %q{fluent-scribe-remote}
+  s.email = %q{kazuki.ohta@gmail.com}
+  s.executables = ["fluent-scribe-remote"]
   s.extra_rdoc_files = [
     "README.rdoc"
   ]

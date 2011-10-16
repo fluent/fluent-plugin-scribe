@@ -8,7 +8,7 @@ begin
     gemspec.name = "fluent-plugin-scribe"
     gemspec.summary = "Scribe plugin for Fluent event collector"
     gemspec.author = "Kazuki Ohta"
-    #gemspec.email = "kazuki.ohta@gmail.com"
+    gemspec.email = "kazuki.ohta@gmail.com"
     gemspec.homepage = "https://github.com/fluent/fluent-plugin-scribe"
     gemspec.has_rdoc = false
     gemspec.require_paths = ["lib"]
@@ -17,8 +17,7 @@ begin
     gemspec.test_files = Dir["test/**/*.rb"]
     gemspec.files = Dir["bin/**/*", "lib/**/*", "test/**/*.rb"] +
       %w[example.conf VERSION AUTHORS Rakefile fluent-plugin-scribe.gemspec]
-
-    gemspec.executables = []
+    gemspec.executables = ['fluent-scribe-remote']
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
