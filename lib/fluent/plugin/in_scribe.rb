@@ -106,10 +106,10 @@ class ScribeInput < Input
     def Log(msgs)
       begin
         msgs.each { |msg|
-          event = Event.new(Engine.now, {
+          record = {
             'message' => msg.message
-          })
-          Engine.emit(msg.category, event)
+          }
+          Engine.emit(msg.category, Engine.new, record)
         }
         return ResultCode::OK
       rescue => e

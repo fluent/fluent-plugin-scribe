@@ -9,10 +9,10 @@ begin
     gemspec.summary = "Scribe plugin for Fluent event collector"
     gemspec.author = "Kazuki Ohta"
     #gemspec.email = "kazuki.ohta@gmail.com"
-    #gemspec.homepage = "http://fluent.github.com/"
+    gemspec.homepage = "https://github.com/fluent/fluent-plugin-scribe"
     gemspec.has_rdoc = false
     gemspec.require_paths = ["lib"]
-    gemspec.add_dependency "fluent", "~> 0.9.7"
+    gemspec.add_dependency "fluentd", "~> 0.10.0"
     gemspec.add_dependency "thrift", "~> 0.7.0"
     gemspec.test_files = Dir["test/**/*.rb"]
     gemspec.files = Dir["bin/**/*", "lib/**/*", "test/**/*.rb"] +
