@@ -6,7 +6,7 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
     gemspec.name = "fluent-plugin-scribe"
-    gemspec.summary = "Scribe plugin for Fluent event collector"
+    gemspec.summary = "Scribe Input/Output plugin for Fluent event collector"
     gemspec.author = "Kazuki Ohta"
     gemspec.email = "kazuki.ohta@gmail.com"
     gemspec.homepage = "https://github.com/fluent/fluent-plugin-scribe"
