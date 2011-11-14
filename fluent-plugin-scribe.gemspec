@@ -5,15 +5,16 @@
 
 Gem::Specification.new do |s|
   s.name = %q{fluent-plugin-scribe}
-  s.version = "0.10.2"
+  s.version = "0.10.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kazuki Ohta"]
-  s.date = %q{2011-10-16}
+  s.date = %q{2011-11-15}
   s.default_executable = %q{fluent-scribe-remote}
   s.email = %q{kazuki.ohta@gmail.com}
   s.executables = ["fluent-scribe-remote"]
   s.extra_rdoc_files = [
+    "ChangeLog",
     "README.rdoc"
   ]
   s.files = [
@@ -38,7 +39,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{https://github.com/fluent/fluent-plugin-scribe}
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.6.2}
-  s.summary = %q{Scribe plugin for Fluent event collector}
+  s.summary = %q{Scribe Input/Output plugin for Fluent event collector}
   s.test_files = ["test/plugin/in_scribe.rb"]
 
   if s.respond_to? :specification_version then
