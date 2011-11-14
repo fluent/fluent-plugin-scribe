@@ -1,0 +1,20 @@
+Release 0.10.3 - 2011/11/14
+
+* fixed encoding problem (work-around for thrift-rb)
+  - contributed by @tagomoris and @frsyuki
+
+
+Release 0.10.2 - 2011/10/16
+
+* implement out_scribe plugin
+
+
+Release 0.10.1 - 2011/10/16
+
+* added tests for in_scribe
+* use Configurable, introduced from fluentd v0.10
+
+
+Release 0.10.0 - 2011/10/16
+
+* compatibility changes for fluentd v0.10
