@@ -72,7 +72,7 @@ class ScribeOutput < BufferedOutput
         next unless record.has_key?(@field_ref)
         entry = LogEntry.new
         entry.category = tag
-        entry.message = record[@field_ref]
+        entry.message = record[@field_ref].force_encoding('ASCII-8BIT')
         entries << entry
       }
       client.Log(entries)

@@ -100,7 +100,7 @@ class ScribeInput < Input
       begin
         msgs.each { |msg|
           record = {
-            'message' => msg.message
+            'message' => msg.message.force_encoding('UTF-8')
           }
           Engine.emit(msg.category, Engine.now, record)
         }
