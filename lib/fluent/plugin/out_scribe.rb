@@ -17,7 +17,7 @@
 #
 module Fluent
 
-class ScribeOutput < BufferedOutput
+class ScribeOutput < ObjectBufferedOutput
   Fluent::Plugin.register_output('scribe', self)
 
   config_param :host,      :string,  :default => 'localhost'
@@ -49,16 +49,7 @@ class ScribeOutput < BufferedOutput
     super
   end
 
-  def format(tag, time, record)
-    [tag, record].to_msgpack
-  end
-
-  def write(chunk)
-    records = []
-    chunk.msgpack_each { |arr|
-      records << arr
-    }
-
+  def write_objects(tag, es)
     socket = Thrift::Socket.new @host, @port, @timeout
     transport = Thrift::FramedTransport.new socket
     protocol = Thrift::BinaryProtocol.new transport, false, false
@@ -67,8 +58,7 @@ class ScribeOutput < BufferedOutput
     transport.open
     begin
       entries = []
-      records.each { |r|
-        tag, record = r
+      es.each { |time,record|
         next unless record.has_key?(@field_ref)
         entry = LogEntry.new
         entry.category = tag

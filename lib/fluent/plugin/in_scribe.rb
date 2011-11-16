@@ -20,6 +20,8 @@ module Fluent
 class ScribeInput < Input
   Plugin.register_input('scribe', self)
 
+  include DetachMultiProcessMixin
+
   config_param :port,            :integer, :default => 1463
   config_param :bind,            :string,  :default => '0.0.0.0'
   config_param :server_type,     :string,  :default => 'nonblocking'
@@ -80,7 +82,16 @@ class ScribeInput < Input
     else
       raise ConfigError, "in_scribe: unsupported server_type '#{@server_type}'"
     end
-    @thread = Thread.new(&method(:run))
+
+    if @detach_process
+      @transport.listen
+      def @transport.listen
+      end
+    end
+
+    detach_multi_process do
+      @thread = Thread.new(&method(:run))
+    end
   end
 
   def shutdown
@@ -98,11 +109,18 @@ class ScribeInput < Input
   class FluentScribeHandler
     def Log(msgs)
       begin
+        tags = {}
+        now = Engine.now
         msgs.each { |msg|
+          tag = msg.category
           record = {
             'message' => msg.message.force_encoding('UTF-8')
           }
-          Engine.emit(msg.category, Engine.now, record)
+          es = (tags[tag] ||= MultiEventStream.new)
+          es.add(now, record)
+        }
+        tags.each_pair { |tag, es|
+          Engine.emit_stream(tag, es)
         }
         return ResultCode::OK
       rescue => e
