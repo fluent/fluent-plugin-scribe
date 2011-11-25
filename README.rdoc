@@ -35,7 +35,11 @@ The category field is used as fluentd 'tag'.
 
 == How to use?
 
-Please add the following configurations to fluent.conf.
+fluent-plugin-scribe contains both input and output.
+
+=== Scribe Input
+
+Please add the following configurations to fluent.conf. This allows your Scribe client to import logs through port 1463.
 
   # Scribe input
   <source>
@@ -43,22 +47,27 @@ Please add the following configurations to fluent.conf.
     port 1463
   </source>
 
-  # Scribe output
-  <match *>
-    type scribe
-    host scribed-host.local
-    port 1463
-  </match>
-
 These options are supported.
 
-* (for input)
 * port: port number (default: 1463)
 * bind: bind address (default: 0.0.0.0)
 * server_type: server architecture either in 'simple', 'threaded', 'thread_pool', 'nonblocking' (default: nonblocking)
 * is_framed: use framed protocol or not (default: true)
 
-* (for output)
+=== Scribe Output
+
+Please add the following configurations to fluent.conf. This allows fluentd to output its logs into another Scribe server. Note that fluentd conveys semi-structured data while Scribe conveys unstructured data, thus, 'field_ref' parameter is prepared to specify which field will be transferred.
+
+  # Scribe output
+  <match *>
+    type scribe
+    host scribed-host.local
+    port 1463
+    field_ref message
+  </match>
+
+These options are supported.
+
 * host: host name or address (default: localhost)
 * port: port number (default: 1463)
 * field_ref: field name which sent as scribe log message (default: message)
