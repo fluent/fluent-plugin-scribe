@@ -25,6 +25,7 @@ class ScribeInput < Input
   config_param :server_type,     :string,  :default => 'nonblocking'
   config_param :is_framed,       :bool,    :default => true
   config_param :body_size_limit, :size,    :default => 32*1024*1024  # TODO default
+  config_param :add_prefix,      :string,  :default => nil
 
   def initialize
     require 'thrift'
@@ -46,6 +47,7 @@ class ScribeInput < Input
     $log.debug "listening scribe on #{@bind}:#{@port}"
 
     handler = FluentScribeHandler.new
+    handler.add_prefix = @add_prefix
     processor = Scribe::Processor.new handler
 
     @transport = Thrift::ServerSocket.new @bind, @port
@@ -96,14 +98,25 @@ class ScribeInput < Input
   end
 
   class FluentScribeHandler
+    attr_accessor :add_prefix
+
     def Log(msgs)
       begin
-        msgs.each { |msg|
-          record = {
-            'message' => msg.message.force_encoding('UTF-8')
+        if @add_prefix
+          msgs.each { |msg|
+            record = {
+              'message' => msg.message.force_encoding('UTF-8')
+            }
+            Engine.emit(@add_prefix + '.' + msg.category, Engine.now, record)
           }
-          Engine.emit(msg.category, Engine.now, record)
-        }
+        else
+          msgs.each { |msg|
+            record = {
+              'message' => msg.message.force_encoding('UTF-8')
+            }
+            Engine.emit(msg.category, Engine.now, record)
+          }
+        end
         return ResultCode::OK
       rescue => e
         $log.error "unexpected error", :error=>$!.to_s

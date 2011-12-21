@@ -31,8 +31,56 @@ class ScribeInputTest < Test::Unit::TestCase
     d.expect_emit "tag1", time, {"message"=>'aiueo'}
     d.expect_emit "tag2", time, {"message"=>'aiueo'}
 
+    emits = [
+             ['tag1', time, {"message"=>'aiueo'}],
+             ['tag2', time, {"message"=>'aiueo'}],
+            ]
     d.run do
-      d.expected_emits.each { |tag, time, record|
+      emits.each { |tag, time, record|
+        res = send(tag, record['message'])
+        assert_equal ResultCode::OK, res
+      }
+    end
+  end
+
+  def test_add_prefix
+    d = create_driver(CONFIG + %[
+      add_prefix scribe
+    ])
+
+    time = Time.parse("2011-01-02 13:14:15 UTC").to_i
+    Fluent::Engine.now = time
+
+    d.expect_emit "scribe.tag1", time, {"message"=>'aiueo'}
+    d.expect_emit "scribe.tag2", time, {"message"=>'aiueo'}
+
+    emits = [
+             ['tag1', time, {"message"=>'aiueo'}],
+             ['tag2', time, {"message"=>'aiueo'}],
+            ]
+    d.run do
+      emits.each { |tag, time, record|
+        res = send(tag, record['message'])
+        assert_equal ResultCode::OK, res
+      }
+    end
+
+    d2 = create_driver(CONFIG + %[
+      add_prefix scribe.input
+    ])
+
+    time = Time.parse("2011-01-02 13:14:15 UTC").to_i
+    Fluent::Engine.now = time
+
+    d2.expect_emit "scribe.input.tag3", time, {"message"=>'aiueo'}
+    d2.expect_emit "scribe.input.tag4", time, {"message"=>'aiueo'}
+
+    emits = [
+             ['tag3', time, {"message"=>'aiueo'}],
+             ['tag4', time, {"message"=>'aiueo'}],
+            ]
+    d2.run do
+      emits.each { |tag, time, record|
         res = send(tag, record['message'])
         assert_equal ResultCode::OK, res
       }
