@@ -25,6 +25,9 @@ class ScribeOutput < BufferedOutput
   config_param :field_ref, :string,  :default => 'message'
   config_param :timeout,   :integer, :default => 30
 
+  config_param :remove_prefix,    :string, :default => nil
+  config_param :default_category, :string, :default => 'unknown'
+
   def initialize
     require 'thrift'
     $:.unshift File.join(File.dirname(__FILE__), 'thrift')
@@ -43,6 +46,11 @@ class ScribeOutput < BufferedOutput
 
   def start
     super
+
+    if @remove_prefix
+      @removed_prefix_string = @remove_prefix + '.'
+      @removed_length = @removed_prefix_string.length
+    end
   end
 
   def shutdown
@@ -50,7 +58,13 @@ class ScribeOutput < BufferedOutput
   end
 
   def format(tag, time, record)
-    [tag, record].to_msgpack
+    if @remove_prefix and
+        ( (tag[0, @removed_length] == @removed_prefix_string and tag.length > @removed_length) or
+          tag == @remove_prefix)
+      [(tag[@removed_length..-1] || @default_category), record].to_msgpack
+    else
+      [tag, record].to_msgpack
+    end
   end
 
   def write(chunk)
