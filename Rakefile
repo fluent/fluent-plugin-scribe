@@ -6,14 +6,14 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
     gemspec.name = "fluent-plugin-scribe"
-    gemspec.summary = "Scribe Input/Output plugin for Fluent event collector"
+    gemspec.summary = "Scribe Input/Output plugin for Fluentd event collector"
     gemspec.author = "Kazuki Ohta"
     gemspec.email = "kazuki.ohta@gmail.com"
     gemspec.homepage = "https://github.com/fluent/fluent-plugin-scribe"
     gemspec.has_rdoc = false
     gemspec.require_paths = ["lib"]
     gemspec.add_dependency "fluentd", "~> 0.10.0"
-    gemspec.add_dependency "thrift", "~> 0.7.0"
+    gemspec.add_dependency "thrift", "~> 0.8.0"
     gemspec.test_files = Dir["test/**/*.rb"]
     gemspec.files = Dir["bin/**/*", "lib/**/*", "test/**/*.rb"] +
       %w[example.conf VERSION AUTHORS Rakefile fluent-plugin-scribe.gemspec]

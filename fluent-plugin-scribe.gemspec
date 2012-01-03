@@ -8,11 +8,10 @@ Gem::Specification.new do |s|
   s.version = "0.10.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Kazuki Ohta"]
-  s.date = %q{2011-11-15}
-  s.default_executable = %q{fluent-scribe-remote}
+  s.authors = [%q{Kazuki Ohta}]
+  s.date = %q{2012-01-03}
   s.email = %q{kazuki.ohta@gmail.com}
-  s.executables = ["fluent-scribe-remote"]
+  s.executables = [%q{fluent-scribe-remote}]
   s.extra_rdoc_files = [
     "ChangeLog",
     "README.rdoc"
@@ -34,27 +33,28 @@ Gem::Specification.new do |s|
     "lib/fluent/plugin/thrift/scribe.thrift",
     "lib/fluent/plugin/thrift/scribe_constants.rb",
     "lib/fluent/plugin/thrift/scribe_types.rb",
-    "test/plugin/in_scribe.rb"
+    "test/plugin/in_scribe.rb",
+    "test/plugin/out_scribe.rb"
   ]
   s.homepage = %q{https://github.com/fluent/fluent-plugin-scribe}
-  s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.6.2}
+  s.require_paths = [%q{lib}]
+  s.rubygems_version = %q{1.8.6}
   s.summary = %q{Scribe Input/Output plugin for Fluent event collector}
-  s.test_files = ["test/plugin/in_scribe.rb"]
+  s.test_files = [%q{test/plugin/in_scribe.rb}, %q{test/plugin/out_scribe.rb}]
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<fluentd>, ["~> 0.10.0"])
-      s.add_runtime_dependency(%q<thrift>, ["~> 0.7.0"])
+      s.add_runtime_dependency(%q<thrift>, ["~> 0.8.0"])
     else
       s.add_dependency(%q<fluentd>, ["~> 0.10.0"])
-      s.add_dependency(%q<thrift>, ["~> 0.7.0"])
+      s.add_dependency(%q<thrift>, ["~> 0.8.0"])
     end
   else
     s.add_dependency(%q<fluentd>, ["~> 0.10.0"])
-    s.add_dependency(%q<thrift>, ["~> 0.7.0"])
+    s.add_dependency(%q<thrift>, ["~> 0.8.0"])
   end
 end
 
