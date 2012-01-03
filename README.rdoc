@@ -53,6 +53,7 @@ These options are supported.
 * bind: bind address (default: 0.0.0.0)
 * server_type: server architecture either in 'simple', 'threaded', 'thread_pool', 'nonblocking' (default: nonblocking)
 * is_framed: use framed protocol or not (default: true)
+* add_prefix: prefix string, added to the tag (default: nil)
 
 === Scribe Output
 
@@ -72,6 +73,7 @@ These options are supported.
 * port: port number (default: 1463)
 * field_ref: field name which sent as scribe log message (default: message)
 * timeout: thrift protocol timeout (default: 30)
+* remove_prefix: prefix string, removed from the tag (default: nil)
 
 == For Developers
 
