@@ -26,6 +26,7 @@ class ScribeInput < Input
   config_param :is_framed,       :bool,    :default => true
   config_param :body_size_limit, :size,    :default => 32*1024*1024  # TODO default
   config_param :add_prefix,      :string,  :default => nil
+  config_param :remove_newline,  :bool,    :default => false
 
   def initialize
     require 'thrift'
@@ -48,6 +49,7 @@ class ScribeInput < Input
 
     handler = FluentScribeHandler.new
     handler.add_prefix = @add_prefix
+    handler.remove_newline = @remove_newline
     processor = Scribe::Processor.new handler
 
     @transport = Thrift::ServerSocket.new @bind, @port
@@ -99,23 +101,42 @@ class ScribeInput < Input
 
   class FluentScribeHandler
     attr_accessor :add_prefix
+    attr_accessor :remove_newline
 
     def Log(msgs)
       begin
         if @add_prefix
-          msgs.each { |msg|
-            record = {
-              'message' => msg.message.force_encoding('UTF-8')
+          if @remove_newline
+            msgs.each { |msg|
+              record = {
+                'message' => msg.message.force_encoding('UTF-8').chomp
+              }
+              Engine.emit(@add_prefix + '.' + msg.category, Engine.now, record)
             }
-            Engine.emit(@add_prefix + '.' + msg.category, Engine.now, record)
-          }
+          else
+            msgs.each { |msg|
+              record = {
+                'message' => msg.message.force_encoding('UTF-8')
+              }
+              Engine.emit(@add_prefix + '.' + msg.category, Engine.now, record)
+            }
+          end
         else
-          msgs.each { |msg|
-            record = {
-              'message' => msg.message.force_encoding('UTF-8')
+          if @remove_newline
+            msgs.each { |msg|
+              record = {
+                'message' => msg.message.force_encoding('UTF-8').chomp
+              }
+              Engine.emit(msg.category, Engine.now, record)
             }
-            Engine.emit(msg.category, Engine.now, record)
-          }
+          else
+            msgs.each { |msg|
+              record = {
+                'message' => msg.message.force_encoding('UTF-8')
+              }
+              Engine.emit(msg.category, Engine.now, record)
+            }
+          end
         end
         return ResultCode::OK
       rescue => e

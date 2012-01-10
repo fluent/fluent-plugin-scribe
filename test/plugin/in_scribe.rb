@@ -20,6 +20,7 @@ class ScribeInputTest < Test::Unit::TestCase
     d = create_driver
     assert_equal 14630, d.instance.port
     assert_equal '127.0.0.1', d.instance.bind
+    assert_equal false, d.instance.remove_newline
   end
 
   def test_time
@@ -80,6 +81,32 @@ class ScribeInputTest < Test::Unit::TestCase
              ['tag4', time, {"message"=>'aiueo'}],
             ]
     d2.run do
+      emits.each { |tag, time, record|
+        res = send(tag, record['message'])
+        assert_equal ResultCode::OK, res
+      }
+    end
+  end
+
+  def test_remove_newline
+    d = create_driver(CONFIG + %[
+      remove_newline true
+    ])
+    assert_equal true, d.instance.remove_newline
+
+    time = Time.parse("2011-01-02 13:14:15 UTC").to_i
+    Fluent::Engine.now = time
+
+    d.expect_emit "tag1", time, {"message"=>'aiueo'}
+    d.expect_emit "tag2", time, {"message"=>'kakikukeko'}
+    d.expect_emit "tag3", time, {"message"=>'sasisuseso'}
+
+    emits = [
+             ['tag1', time, {"message"=>"aiueo\n"}],
+             ['tag2', time, {"message"=>"kakikukeko\n"}],
+             ['tag3', time, {"message"=>"sasisuseso"}],
+            ]
+    d.run do
       emits.each { |tag, time, record|
         res = send(tag, record['message'])
         assert_equal ResultCode::OK, res
