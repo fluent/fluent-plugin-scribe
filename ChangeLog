@@ -1,7 +1,24 @@
-Release 0.10.3 - 2011/11/14
+Release 0.10.6 - 2011/01/23
+
+* support add_prefix / remove_prefix option
+* update thrift to 0.8.0
+* support remove_newline option
+
+
+Release 0.10.5 - 2011/11/16
+
+* fixed broken gemspec
+
+
+Release 0.10.4 - 2011/11/14
 
 * fixed encoding problem (work-around for thrift-rb)
   - contributed by @tagomoris and @frsyuki
+
+
+Release 0.10.3 - 2011/10/16
+
+* modify summary of gemspec
 
 
 Release 0.10.2 - 2011/10/16
