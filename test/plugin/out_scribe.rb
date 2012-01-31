@@ -69,6 +69,19 @@ remove_prefix test
     d.emit({"message" => "xxx testing first", "message2" => "xxx testing first another data"}, time)
     d.expect_format ['unknown', {"message" => "xxx testing first", "message2" => "xxx testing first another data"}].to_msgpack
     d.run
+
+    d = create_driver(CONFIG + %[
+field_ref message2
+remove_prefix test
+add_newline true
+    ], 'test.scribeplugin')
+    assert_equal 'test.scribeplugin', d.tag
+
+    d.emit({"message" => "xxx testing first", "message2" => "xxx testing first another data"}, time)
+    d.emit({"message" => "xxx testing second", "message2" => "xxx testing second another data"}, time)
+    d.expect_format ['scribeplugin', {"message" => "xxx testing first", "message2" => "xxx testing first another data"}].to_msgpack
+    d.expect_format ['scribeplugin', {"message" => "xxx testing second", "message2" => "xxx testing second another data"}].to_msgpack
+    d.run
   end
 
   def test_write
@@ -92,6 +105,18 @@ remove_prefix test
     result = d.run
     assert_equal ResultCode::OK, result
     assert_equal [['scribeplugin', 'xxx testing first another data'], ['scribeplugin', 'xxx testing second another data']], $handler.last
+
+    d = create_driver(CONFIG + %[
+field_ref message2
+remove_prefix test
+add_newline true
+    ], 'test.scribeplugin')
+    assert_equal 'test.scribeplugin', d.tag
+    d.emit({"message" => "xxx testing first", "message2" => "xxx testing first another data"}, time)
+    d.emit({"message" => "xxx testing second", "message2" => "xxx testing second another data"}, time)
+    result = d.run
+    assert_equal ResultCode::OK, result
+    assert_equal [['scribeplugin', "xxx testing first another data\n"], ['scribeplugin', "xxx testing second another data\n"]], $handler.last
 
     d = create_driver(CONFIG + %[
 field_ref message2

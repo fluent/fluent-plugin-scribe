@@ -26,6 +26,7 @@ class ScribeOutput < BufferedOutput
   config_param :timeout,   :integer, :default => 30
 
   config_param :remove_prefix,    :string, :default => nil
+  config_param :add_newline,      :bool,   :default => false
   config_param :default_category, :string, :default => 'unknown'
 
   def initialize
@@ -81,14 +82,25 @@ class ScribeOutput < BufferedOutput
     transport.open
     begin
       entries = []
-      records.each { |r|
-        tag, record = r
-        next unless record.has_key?(@field_ref)
-        entry = LogEntry.new
-        entry.category = tag
-        entry.message = record[@field_ref].force_encoding('ASCII-8BIT')
-        entries << entry
-      }
+      if @add_newline
+        records.each { |r|
+          tag, record = r
+          next unless record.has_key?(@field_ref)
+          entry = LogEntry.new
+          entry.category = tag
+          entry.message = (record[@field_ref] + "\n").force_encoding('ASCII-8BIT')
+          entries << entry
+        }
+      else
+        records.each { |r|
+          tag, record = r
+          next unless record.has_key?(@field_ref)
+          entry = LogEntry.new
+          entry.category = tag
+          entry.message = record[@field_ref].force_encoding('ASCII-8BIT')
+          entries << entry
+        }
+      end
       client.Log(entries)
     ensure
       transport.close
