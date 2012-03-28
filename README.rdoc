@@ -73,6 +73,7 @@ These options are supported.
 * port: port number (default: 1463)
 * field_ref: field name which sent as scribe log message (default: message)
 * timeout: thrift protocol timeout (default: 30)
+* body_format: parse a body message as a specified format (default: 'text', option: 'json')
 * remove_prefix: prefix string, removed from the tag (default: nil)
 
 == For Developers

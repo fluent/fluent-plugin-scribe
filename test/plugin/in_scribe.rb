@@ -114,6 +114,32 @@ class ScribeInputTest < Test::Unit::TestCase
     end
   end
 
+  def test_message_format_json
+    d = create_driver(CONFIG + %[
+      message_format json
+    ])
+    assert_equal 'json', d.instance.message_format
+
+    time = Time.parse("2011-01-02 13:14:15 UTC").to_i
+    Fluent::Engine.now = time
+
+    d.expect_emit "tag1", time, {"a"=>1}
+    d.expect_emit "tag2", time, {"a"=>1, "b"=>2}
+    d.expect_emit "tag3", time, {"a"=>1, "b"=>2, "c"=>3}
+
+    emits = [
+             ['tag1', time, {"a"=>1}.to_json],
+             ['tag2', time, {"a"=>1, "b"=>2}.to_json],
+             ['tag3', time, {"a"=>1, "b"=>2, "c"=>3}.to_json],
+            ]
+    d.run do
+      emits.each { |tag, time, message|
+        res = send(tag, message)
+        assert_equal ResultCode::OK, res
+      }
+    end
+  end
+
   def send(tag, msg)
     socket = Thrift::Socket.new '127.0.0.1', 14630
     transport = Thrift::FramedTransport.new socket

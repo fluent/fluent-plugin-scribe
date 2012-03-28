@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'thrift'
+require 'json'
 $:.unshift File.join(File.dirname(__FILE__), '../lib/fluent/plugin/thrift')
 require 'fb303_types'
 require 'fb303_constants'
@@ -24,7 +25,7 @@ raw_sock.setsockopt Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1
 
 entry = LogEntry.new
 entry.category = 'debug.hoge'
-entry.message = 'fuga'
+entry.message = {'a' => 'b'}.to_json
 p client.Log([entry])
 
 transport.close

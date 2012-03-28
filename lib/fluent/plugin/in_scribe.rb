@@ -27,6 +27,7 @@ class ScribeInput < Input
   config_param :body_size_limit, :size,    :default => 32*1024*1024  # TODO default
   config_param :add_prefix,      :string,  :default => nil
   config_param :remove_newline,  :bool,    :default => false
+  config_param :message_format,  :string,  :default => 'text'
 
   def initialize
     require 'thrift'
@@ -50,6 +51,7 @@ class ScribeInput < Input
     handler = FluentScribeHandler.new
     handler.add_prefix = @add_prefix
     handler.remove_newline = @remove_newline
+    handler.message_format = @message_format
     processor = Scribe::Processor.new handler
 
     @transport = Thrift::ServerSocket.new @bind, @port
@@ -57,6 +59,10 @@ class ScribeInput < Input
       transport_factory = Thrift::FramedTransportFactory.new
     else
       transport_factory = Thrift::BufferedTransportFactory.new
+    end
+
+    unless ['text', 'json'].include? @message_format
+      raise 'Unknown format: message_format=#{@message_format}'
     end
 
     # 2011/09/29 Kazuki Ohta <kazuki.ohta@gmail.com>
@@ -102,47 +108,41 @@ class ScribeInput < Input
   class FluentScribeHandler
     attr_accessor :add_prefix
     attr_accessor :remove_newline
+    attr_accessor :message_format
 
     def Log(msgs)
       begin
-        if @add_prefix
-          if @remove_newline
-            msgs.each { |msg|
-              record = {
-                'message' => msg.message.force_encoding('UTF-8').chomp
-              }
-              Engine.emit(@add_prefix + '.' + msg.category, Engine.now, record)
-            }
+        msgs.each { |msg|
+          record = create_record(msg)
+          if @add_prefix
+            Engine.emit(@add_prefix + '.' + msg.category, Engine.now, record)
           else
-            msgs.each { |msg|
-              record = {
-                'message' => msg.message.force_encoding('UTF-8')
-              }
-              Engine.emit(@add_prefix + '.' + msg.category, Engine.now, record)
-            }
+            Engine.emit(msg.category, Engine.now, record)
           end
-        else
-          if @remove_newline
-            msgs.each { |msg|
-              record = {
-                'message' => msg.message.force_encoding('UTF-8').chomp
-              }
-              Engine.emit(msg.category, Engine.now, record)
-            }
-          else
-            msgs.each { |msg|
-              record = {
-                'message' => msg.message.force_encoding('UTF-8')
-              }
-              Engine.emit(msg.category, Engine.now, record)
-            }
-          end
-        end
+        }
         return ResultCode::OK
       rescue => e
         $log.error "unexpected error", :error=>$!.to_s
         $log.error_backtrace
         return ResultCode::TRY_LATER
+      end
+    end
+
+    private
+    def create_record(msg)
+      case @message_format
+      when 'text'
+        if @remove_newline
+          return { 'message' => msg.message.force_encoding('UTF-8').chomp }
+        else
+          return { 'message' => msg.message.force_encoding('UTF-8') }
+        end
+      when 'json'
+        js = JSON.parse(msg.message.force_encoding('UTF-8'))
+        raise 'body must be a Hash, if json_body=true' unless js.is_a?(Hash)
+        return js
+      else
+        raise 'Invalid format: #{@message_format}'
       end
     end
   end
