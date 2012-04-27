@@ -1,3 +1,8 @@
+Release 0.10.8 - 2011/04/27
+
+* support msg_format option at in_scribe
+
+
 Release 0.10.7 - 2011/02/04
 
 * support add_newline option at out_scribe

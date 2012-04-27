@@ -54,6 +54,7 @@ These options are supported.
 * server_type: server architecture either in 'simple', 'threaded', 'thread_pool', 'nonblocking' (default: nonblocking)
 * is_framed: use framed protocol or not (default: true)
 * add_prefix: prefix string, added to the tag (default: nil)
+* msg_format: format of the messages either in 'text', 'json', 'url_param' (default: text)
 
 === Scribe Output
 

@@ -27,9 +27,10 @@ class ScribeInput < Input
   config_param :body_size_limit, :size,    :default => 32*1024*1024  # TODO default
   config_param :add_prefix,      :string,  :default => nil
   config_param :remove_newline,  :bool,    :default => false
-  config_param :message_format,  :string,  :default => 'text'
+  config_param :msg_format,      :string,  :default => 'text'
 
   def initialize
+    require 'cgi'
     require 'thrift'
     $:.unshift File.join(File.dirname(__FILE__), 'thrift')
     require 'fb303_types'
@@ -51,7 +52,7 @@ class ScribeInput < Input
     handler = FluentScribeHandler.new
     handler.add_prefix = @add_prefix
     handler.remove_newline = @remove_newline
-    handler.message_format = @message_format
+    handler.msg_format = @msg_format
     processor = Scribe::Processor.new handler
 
     @transport = Thrift::ServerSocket.new @bind, @port
@@ -61,8 +62,8 @@ class ScribeInput < Input
       transport_factory = Thrift::BufferedTransportFactory.new
     end
 
-    unless ['text', 'json'].include? @message_format
-      raise 'Unknown format: message_format=#{@message_format}'
+    unless ['text', 'json', 'url_param'].include? @msg_format
+      raise 'Unknown format: msg_format=#{@msg_format}'
     end
 
     # 2011/09/29 Kazuki Ohta <kazuki.ohta@gmail.com>
@@ -108,7 +109,7 @@ class ScribeInput < Input
   class FluentScribeHandler
     attr_accessor :add_prefix
     attr_accessor :remove_newline
-    attr_accessor :message_format
+    attr_accessor :msg_format
 
     def Log(msgs)
       begin
@@ -130,7 +131,7 @@ class ScribeInput < Input
 
     private
     def create_record(msg)
-      case @message_format
+      case @msg_format
       when 'text'
         if @remove_newline
           return { 'message' => msg.message.force_encoding('UTF-8').chomp }
@@ -141,8 +142,15 @@ class ScribeInput < Input
         js = JSON.parse(msg.message.force_encoding('UTF-8'))
         raise 'body must be a Hash, if json_body=true' unless js.is_a?(Hash)
         return js
+      when 'url_param'
+        s = msg.message.force_encoding('UTF-8')
+        return Hash[ s.split('&').map { |kv|
+            k,v = kv.split('=', 2);
+            [CGI.unescape(k), CGI.unescape(v)]
+          }
+        ]
       else
-        raise 'Invalid format: #{@message_format}'
+        raise 'Invalid format: #{@msg_format}'
       end
     end
   end
