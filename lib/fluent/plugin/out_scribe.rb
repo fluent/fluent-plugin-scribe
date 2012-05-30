@@ -28,7 +28,6 @@ class ScribeOutput < BufferedOutput
   config_param :remove_prefix,    :string,  :default => nil
   config_param :add_newline,      :bool,    :default => false
   config_param :default_category, :string,  :default => 'unknown'
-  config_param :batch_limit,      :integer, :default => 10_000
 
   def initialize
     require 'thrift'
@@ -43,6 +42,9 @@ class ScribeOutput < BufferedOutput
   end
 
   def configure(conf)
+    # override default buffer_chunk_limit
+    conf['buffer_chunk_limit'] ||= '1m'
+
     super
   end
 
@@ -70,9 +72,6 @@ class ScribeOutput < BufferedOutput
   end
 
   def write(chunk)
-    count = 0
-    entries = []
-
     socket = Thrift::Socket.new @host, @port, @timeout
     transport = Thrift::FramedTransport.new socket
     protocol = Thrift::BinaryProtocol.new transport, false, false
@@ -80,10 +79,11 @@ class ScribeOutput < BufferedOutput
 
     transport.open
     begin
+      entries = []
+
       chunk.msgpack_each do |arr|
         tag, record = arr
         next unless record.has_key?(@field_ref)
-
 
         entry = LogEntry.new
         entry.category = tag
@@ -95,14 +95,6 @@ class ScribeOutput < BufferedOutput
         end
 
         entries << entry
-        count += 1
-
-        if count >= @batch_limit
-          $log.info "Writing batch of #{batch_limit} to scribe"
-          client.Log(entries)
-          entries = []
-          count = 0
-        end
       end
 
       $log.info "Writing #{entries.count} entries to scribe"
