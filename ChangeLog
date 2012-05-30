@@ -1,47 +1,34 @@
-Release 0.10.8 - 2011/04/27
+Release 0.10.9 - 2011/05/30
+* overwrite default value of buffer_chunk_limit to 1MB
+* improve memory usage efficiency
 
+Release 0.10.8 - 2011/04/27
 * support msg_format option at in_scribe
 
-
 Release 0.10.7 - 2011/02/04
-
 * support add_newline option at out_scribe
 
-
 Release 0.10.6 - 2011/01/23
-
 * support add_prefix / remove_prefix option
 * update thrift to 0.8.0
 * support remove_newline option
 
-
 Release 0.10.5 - 2011/11/16
-
 * fixed broken gemspec
 
-
 Release 0.10.4 - 2011/11/14
-
 * fixed encoding problem (work-around for thrift-rb)
   - contributed by @tagomoris and @frsyuki
 
-
 Release 0.10.3 - 2011/10/16
-
 * modify summary of gemspec
 
-
 Release 0.10.2 - 2011/10/16
-
 * implement out_scribe plugin
 
-
 Release 0.10.1 - 2011/10/16
-
 * added tests for in_scribe
 * use Configurable, introduced from fluentd v0.10
 
-
 Release 0.10.0 - 2011/10/16
-
 * compatibility changes for fluentd v0.10
