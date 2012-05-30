@@ -25,9 +25,10 @@ class ScribeOutput < BufferedOutput
   config_param :field_ref, :string,  :default => 'message'
   config_param :timeout,   :integer, :default => 30
 
-  config_param :remove_prefix,    :string, :default => nil
-  config_param :add_newline,      :bool,   :default => false
-  config_param :default_category, :string, :default => 'unknown'
+  config_param :remove_prefix,    :string,  :default => nil
+  config_param :add_newline,      :bool,    :default => false
+  config_param :default_category, :string,  :default => 'unknown'
+  config_param :batch_limit,      :integer, :default => 10_000
 
   def initialize
     require 'thrift'
@@ -69,10 +70,8 @@ class ScribeOutput < BufferedOutput
   end
 
   def write(chunk)
-    records = []
-    chunk.msgpack_each { |arr|
-      records << arr
-    }
+    count = 0
+    entries = []
 
     socket = Thrift::Socket.new @host, @port, @timeout
     transport = Thrift::FramedTransport.new socket
@@ -81,26 +80,32 @@ class ScribeOutput < BufferedOutput
 
     transport.open
     begin
-      entries = []
-      if @add_newline
-        records.each { |r|
-          tag, record = r
-          next unless record.has_key?(@field_ref)
-          entry = LogEntry.new
-          entry.category = tag
+      chunk.msgpack_each do |arr|
+        tag, record = arr
+        next unless record.has_key?(@field_ref)
+
+
+        entry = LogEntry.new
+        entry.category = tag
+
+        if @add_newline
           entry.message = (record[@field_ref] + "\n").force_encoding('ASCII-8BIT')
-          entries << entry
-        }
-      else
-        records.each { |r|
-          tag, record = r
-          next unless record.has_key?(@field_ref)
-          entry = LogEntry.new
-          entry.category = tag
+        else
           entry.message = record[@field_ref].force_encoding('ASCII-8BIT')
-          entries << entry
-        }
+        end
+
+        entries << entry
+        count += 1
+
+        if count >= @batch_limit
+          $log.info "Writing batch of #{batch_limit} to scribe"
+          client.Log(entries)
+          entries = []
+          count = 0
+        end
       end
+
+      $log.info "Writing #{entries.count} entries to scribe"
       client.Log(entries)
     ensure
       transport.close

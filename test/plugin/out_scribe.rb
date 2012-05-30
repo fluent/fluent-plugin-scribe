@@ -137,7 +137,26 @@ remove_prefix test
     result = d.run
     assert_equal ResultCode::OK, result
     assert_equal [[d.instance.default_category, 'zzz testing first another data']], $handler.last
-  end
+  
+    d = create_driver(CONFIG + %[
+batch_limit 5
+    ], 'xxx.test.scribeplugin')
+    assert_equal 'xxx.test.scribeplugin', d.tag
+    d.emit({"message" => "testing first", "message2" => "testing first another data"}, time)
+    d.emit({"message" => "testing second", "message2" => "testing second another data"}, time)
+    d.emit({"message" => "testing third", "message2" => "testing third another data"}, time)
+    d.emit({"message" => "testing fourth", "message2" => "testing fourth another data"}, time)
+    d.emit({"message" => "testing fifth", "message2" => "testing fifth another data"}, time)
+    d.emit({"message" => "testing sixth", "message2" => "testing sixth another data"}, time)
+    d.emit({"message" => "testing seventh", "message2" => "testing seventh another data"}, time)
+
+    $handler.reset_count
+    assert_equal 0, $handler.total_count
+    result = d.run
+    assert_equal ResultCode::OK, result
+    assert_equal [[d.tag, 'testing sixth'], [d.tag, 'testing seventh']], $handler.last
+    assert_equal 7, $handler.total_count
+end
 
   def setup
     Fluent::Test.setup
@@ -169,12 +188,18 @@ remove_prefix test
 
   class TestScribeServerHandler
     attr :last
+    attr :total_count
     def initialize
       @last = []
+      @total_count = 0
     end
     def Log(msgs)
       @last = msgs.map{|msg| [msg.category, msg.message.force_encoding('UTF-8')]}
+      @total_count += msgs.count
       ResultCode::OK
+    end
+    def reset_count
+      @total_count = 0
     end
   end
 end
