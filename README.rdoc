@@ -92,6 +92,7 @@ Then please execute the sample client.
 
 * {Satoshi Tagomori}[https://github.com/tagomoris]
 * {Sadayuki Furuhashi}[https://github.com/frsyuki]
+* {Ken Robertson}[https://github.com/krobertson]
 
 == Copyright
 
