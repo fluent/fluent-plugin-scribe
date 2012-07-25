@@ -97,7 +97,7 @@ class ScribeOutput < BufferedOutput
         entries << entry
       end
 
-      $log.info "Writing #{entries.count} entries to scribe"
+      $log.debug "Writing #{entries.count} entries to scribe"
       client.Log(entries)
     ensure
       transport.close
