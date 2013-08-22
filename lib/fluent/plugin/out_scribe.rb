@@ -22,7 +22,7 @@ class ScribeOutput < BufferedOutput
 
   config_param :host,      :string,  :default => 'localhost'
   config_param :port,      :integer, :default => 1463
-  config_param :field_ref, :string,  :default => 'message'
+  config_param :field_ref, :string,  :default => nil # or 'message' ...
   config_param :timeout,   :integer, :default => 30
 
   config_param :remove_prefix,    :string,  :default => nil
@@ -83,16 +83,21 @@ class ScribeOutput < BufferedOutput
 
       chunk.msgpack_each do |arr|
         tag, record = arr
-        next unless record.has_key?(@field_ref)
+        next unless @field_ref && record.has_key?(@field_ref) || true
 
+        message = @field_ref && record[@field_ref] || record
+
+        if message.kind_of?(Array) or message.kind_of?(Hash)
+          message = message.to_json
+        end
+  
+        if @add_newline
+          message = message + "\n"
+        end
+  
         entry = LogEntry.new
         entry.category = tag
-
-        if @add_newline
-          entry.message = (record[@field_ref] + "\n").force_encoding('ASCII-8BIT')
-        else
-          entry.message = record[@field_ref].force_encoding('ASCII-8BIT')
-        end
+        entry.message = message.force_encoding('ASCII-8BIT')
 
         entries << entry
       end
