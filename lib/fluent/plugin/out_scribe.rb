@@ -89,9 +89,9 @@ class ScribeOutput < BufferedOutput
         entry.category = tag
 
         if @add_newline
-          entry.message = (record[@field_ref] + "\n").force_encoding('ASCII-8BIT')
+          entry.message = (record[@field_ref] + "\n")
         else
-          entry.message = record[@field_ref].force_encoding('ASCII-8BIT')
+          entry.message = record[@field_ref]
         end
 
         entries << entry
