@@ -87,10 +87,10 @@ class ScribeOutput < BufferedOutput
 
         entry = LogEntry.new
         entry.category = tag
-        if record[@field_ref].class == "Hash"
-          msg = record[@field_ref].to_json.force_encoding('ASCII-8BIT')
-        else
+        if record[@field_ref].class == "String"
           msg = record[@field_ref].force_encoding('ASCII-8BIT')
+        else
+          msg = record[@field_ref].to_json.force_encoding('ASCII-8BIT')
         end
         if @add_newline
           entry.message = (msg + "\n")
