@@ -83,7 +83,7 @@ class ScribeOutput < BufferedOutput
 
       chunk.msgpack_each do |arr|
         tag, record = arr
-        next @field_ref !='' && unless record.has_key?(@field_ref)
+        next if(@field_ref !='' && !record.has_key?(@field_ref))
 
         entry = LogEntry.new
         entry.category = tag
