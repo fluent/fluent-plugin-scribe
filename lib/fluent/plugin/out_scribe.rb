@@ -22,7 +22,7 @@ class ScribeOutput < BufferedOutput
 
   config_param :host,      :string,  :default => 'localhost'
   config_param :port,      :integer, :default => 1463
-  config_param :field_ref, :string,  :default => 'message'
+  config_param :field_ref, :string,  :default => ''
   config_param :timeout,   :integer, :default => 30
 
   config_param :remove_prefix,    :string,  :default => nil
@@ -43,7 +43,7 @@ class ScribeOutput < BufferedOutput
 
   def configure(conf)
     # override default buffer_chunk_limit
-    conf['buffer_chunk_limit'] ||= '1m'
+    conf['buffer_chunk_limit'] ||= '32m'
 
     super
   end
@@ -87,15 +87,19 @@ class ScribeOutput < BufferedOutput
 
         entry = LogEntry.new
         entry.category = tag
-        if record[@field_ref].class == "String"
-          msg = record[@field_ref].force_encoding('ASCII-8BIT')
+        if @field_ref == ''
+          msg = record.to_json.force_encoding('ASCII-8BIT')
         else
-          msg = record[@field_ref].to_json.force_encoding('ASCII-8BIT')
-        end
-        if @add_newline
-          entry.message = (msg + "\n")
-        else
-          entry.message = msg
+          if record[@field_ref].class == 'String'
+            msg = record[@field_ref].force_encoding('ASCII-8BIT')
+          else
+            msg = record[@field_ref].to_json.force_encoding('ASCII-8BIT')
+          end
+          if @add_newline
+            entry.message = (msg + "\n")
+          else
+            entry.message = msg
+          end
         end
 
         entries << entry
