@@ -83,7 +83,7 @@ class ScribeOutput < BufferedOutput
 
       chunk.msgpack_each do |arr|
         tag, record = arr
-        next unless record.has_key?(@field_ref)
+        next @field_ref !='' && unless record.has_key?(@field_ref)
 
         entry = LogEntry.new
         entry.category = tag
@@ -95,11 +95,11 @@ class ScribeOutput < BufferedOutput
           else
             msg = record[@field_ref].to_json.force_encoding('ASCII-8BIT')
           end
-          if @add_newline
+        end
+        if @add_newline
             entry.message = (msg + "\n")
-          else
-            entry.message = msg
-          end
+        else
+          entry.message = msg
         end
 
         entries << entry
