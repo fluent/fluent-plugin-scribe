@@ -22,12 +22,13 @@ class ScribeOutput < BufferedOutput
 
   config_param :host,      :string,  :default => 'localhost'
   config_param :port,      :integer, :default => 1463
-  config_param :field_ref, :string,  :default => nil # or 'message' ...
+  config_param :field_ref, :string,  :default => 'message'
   config_param :timeout,   :integer, :default => 30
 
   config_param :remove_prefix,    :string,  :default => nil
   config_param :add_newline,      :bool,    :default => false
   config_param :default_category, :string,  :default => 'unknown'
+  config_param :format_to_json,   :bool,    :default => false
 
   def initialize
     require 'thrift'
@@ -83,18 +84,18 @@ class ScribeOutput < BufferedOutput
 
       chunk.msgpack_each do |arr|
         tag, record = arr
-        next unless @field_ref && record.has_key?(@field_ref) || true
+        next unless @format_to_json && true || record.has_key?(@field_ref)
 
-        message = @field_ref && record[@field_ref] || record
+        message = @format_to_json && record || record[@field_ref]
 
         if message.kind_of?(Array) or message.kind_of?(Hash)
           message = message.to_json
         end
-  
+
         if @add_newline
           message = message + "\n"
         end
-  
+
         entry = LogEntry.new
         entry.category = tag
         entry.message = message.force_encoding('ASCII-8BIT')
