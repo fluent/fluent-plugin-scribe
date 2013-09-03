@@ -43,7 +43,7 @@ class ScribeOutput < BufferedOutput
 
   def configure(conf)
     # override default buffer_chunk_limit
-    conf['buffer_chunk_limit'] ||= '32m'
+    conf['buffer_chunk_limit'] ||= '2m'
 
     super
   end
