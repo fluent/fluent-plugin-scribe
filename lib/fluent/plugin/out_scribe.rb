@@ -84,9 +84,9 @@ class ScribeOutput < BufferedOutput
 
       chunk.msgpack_each do |arr|
         tag, record = arr
-        next unless @format_to_json && true || record.has_key?(@field_ref)
+        next unless @format_to_json || record.has_key?(@field_ref)
 
-        message = @format_to_json && record || record[@field_ref]
+        message = @format_to_json ? record : record[@field_ref]
 
         if message.kind_of?(Array) or message.kind_of?(Hash)
           message = message.to_json
