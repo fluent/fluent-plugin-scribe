@@ -18,6 +18,12 @@ class ScribeInputTest < Test::Unit::TestCase
     Fluent::Test::InputTestDriver.new(Fluent::ScribeInput).configure(conf)
   end
 
+  def shutdown_driver(driver)
+    return unless driver.instance.instance_eval{ @thread }
+    driver.instance.shutdown
+    driver.instance.instance_eval{ @thread && @thread.join }
+  end
+
   def test_configure
     d = create_driver
     assert_equal 14630, d.instance.port
@@ -44,6 +50,8 @@ class ScribeInputTest < Test::Unit::TestCase
         assert_equal ResultCode::OK, res
       }
     end
+
+    shutdown_driver(d)
   end
 
   def test_add_prefix
@@ -68,6 +76,8 @@ class ScribeInputTest < Test::Unit::TestCase
       }
     end
 
+    shutdown_driver(d)
+
     d2 = create_driver(CONFIG + %[
       add_prefix scribe.input
     ])
@@ -88,6 +98,8 @@ class ScribeInputTest < Test::Unit::TestCase
         assert_equal ResultCode::OK, res
       }
     end
+
+    shutdown_driver(d2)
   end
 
   def test_remove_newline
@@ -114,6 +126,8 @@ class ScribeInputTest < Test::Unit::TestCase
         assert_equal ResultCode::OK, res
       }
     end
+
+    shutdown_driver(d)
   end
 
   def test_msg_format_json
@@ -140,6 +154,8 @@ class ScribeInputTest < Test::Unit::TestCase
         assert_equal ResultCode::OK, res
       }
     end
+
+    shutdown_driver(d)
   end
 
   def test_msg_format_url_param
@@ -170,6 +186,8 @@ class ScribeInputTest < Test::Unit::TestCase
         assert_equal ResultCode::OK, res
       }
     end
+
+    shutdown_driver(d)
   end
 
   def message_send(tag, msg)
