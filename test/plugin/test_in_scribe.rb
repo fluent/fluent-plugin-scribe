@@ -1,6 +1,8 @@
 require 'test/unit'
 require 'fluent/test'
-require 'lib/fluent/plugin/in_scribe'
+require 'fluent/plugin/in_scribe'
+
+require 'thrift'
 
 class ScribeInputTest < Test::Unit::TestCase
   def setup
@@ -38,7 +40,7 @@ class ScribeInputTest < Test::Unit::TestCase
             ]
     d.run do
       emits.each { |tag, time, record|
-        res = send(tag, record['message'])
+        res = message_send(tag, record['message'])
         assert_equal ResultCode::OK, res
       }
     end
@@ -61,7 +63,7 @@ class ScribeInputTest < Test::Unit::TestCase
             ]
     d.run do
       emits.each { |tag, time, record|
-        res = send(tag, record['message'])
+        res = message_send(tag, record['message'])
         assert_equal ResultCode::OK, res
       }
     end
@@ -82,7 +84,7 @@ class ScribeInputTest < Test::Unit::TestCase
             ]
     d2.run do
       emits.each { |tag, time, record|
-        res = send(tag, record['message'])
+        res = message_send(tag, record['message'])
         assert_equal ResultCode::OK, res
       }
     end
@@ -108,7 +110,7 @@ class ScribeInputTest < Test::Unit::TestCase
             ]
     d.run do
       emits.each { |tag, time, record|
-        res = send(tag, record['message'])
+        res = message_send(tag, record['message'])
         assert_equal ResultCode::OK, res
       }
     end
@@ -134,7 +136,7 @@ class ScribeInputTest < Test::Unit::TestCase
             ]
     d.run do
       emits.each { |tag, time, message|
-        res = send(tag, message)
+        res = message_send(tag, message)
         assert_equal ResultCode::OK, res
       }
     end
@@ -164,13 +166,13 @@ class ScribeInputTest < Test::Unit::TestCase
             ]
     d.run do
       emits.each { |tag, time, message|
-        res = send(tag, message)
+        res = message_send(tag, message)
         assert_equal ResultCode::OK, res
       }
     end
   end
 
-  def send(tag, msg)
+  def message_send(tag, msg)
     socket = Thrift::Socket.new '127.0.0.1', 14630
     transport = Thrift::FramedTransport.new socket
     protocol = Thrift::BinaryProtocol.new transport, false, false

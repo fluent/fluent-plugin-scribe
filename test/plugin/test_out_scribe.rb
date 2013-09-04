@@ -1,6 +1,8 @@
 require 'test/unit'
 require 'fluent/test'
-require 'lib/fluent/plugin/out_scribe'
+require 'fluent/plugin/out_scribe'
+
+require 'thrift'
 
 class ScribeOutputTest < Test::Unit::TestCase
   CONFIG = %[
