@@ -9,6 +9,11 @@ class ScribeOutputTest < Test::Unit::TestCase
     host 127.0.0.1
     port 14630
   ]
+  CONFIG_TO_JSON = %[
+    host 127.0.0.1
+    port 14630
+    format_to_json yes
+  ]
 
   def create_driver(conf=CONFIG, tag='test')
     Fluent::Test::BufferedOutputTestDriver.new(Fluent::ScribeOutput, tag).configure(conf)
@@ -139,6 +144,26 @@ remove_prefix test
     result = d.run
     assert_equal ResultCode::OK, result
     assert_equal [[d.instance.default_category, 'zzz testing first another data']], $handler.last
+  end
+
+  def test_write_to_json
+    time = Time.parse("2011-12-21 13:14:15 UTC").to_i
+
+    d = create_driver(CONFIG_TO_JSON)
+    e1 = {"message" => "testing first", "message2" => "testing first another data"}
+    e2 = {"message" => "testing second", "message2" => "testing second another data"}
+    e3 = {"message" => "testing third", "message2" => "testing third another data"}
+    [e1,e2,e3].each{|e| d.emit(e, time)}
+    result = d.run
+    assert_equal ResultCode::OK, result
+
+    events = $handler.last
+    assert_equal d.tag, events[0][0]
+    assert_equal e1, JSON.parse(events[0][1])
+    assert_equal d.tag, events[1][0]
+    assert_equal e2, JSON.parse(events[1][1])
+    assert_equal d.tag, events[2][0]
+    assert_equal e3, JSON.parse(events[2][1])
   end
 
   def setup
