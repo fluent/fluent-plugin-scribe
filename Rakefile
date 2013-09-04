@@ -1,28 +1,8 @@
-require 'rake'
-require 'rake/testtask'
-require 'rake/clean'
+#!/usr/bin/env rake
+require "bundler/gem_tasks"
 
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gemspec|
-    gemspec.name = "fluent-plugin-scribe"
-    gemspec.summary = "Scribe Input/Output plugin for Fluentd event collector"
-    gemspec.author = "Kazuki Ohta"
-    gemspec.email = "kazuki.ohta@gmail.com"
-    gemspec.homepage = "https://github.com/fluent/fluent-plugin-scribe"
-    gemspec.has_rdoc = false
-    gemspec.require_paths = ["lib"]
-    gemspec.add_dependency "fluentd", "~> 0.10.0"
-    gemspec.add_dependency "thrift", "~> 0.8.0"
-    gemspec.test_files = Dir["test/**/*.rb"]
-    gemspec.files = Dir["bin/**/*", "lib/**/*", "test/**/*.rb"] +
-      %w[example.conf VERSION AUTHORS Rakefile fluent-plugin-scribe.gemspec]
-    gemspec.executables = ['fluent-scribe-remote']
-  end
-  Jeweler::GemcutterTasks.new
-rescue LoadError
-  puts "Jeweler not available. Install it with: gem install jeweler"
-end
+require 'rake'
+require 'rake/clean'
 
 task "thrift_gen" do
   system "rm -f common.thrift jobtracker.thrift"
@@ -38,27 +18,11 @@ task "thrift_gen" do
   system "rm -fR tmp"
 end
 
-Rake::TestTask.new(:test) do |t|
-  t.test_files = Dir['test/plugin/*.rb']
-  t.ruby_opts = ['-rubygems'] if defined? Gem
-  t.ruby_opts << '-I.'
+require 'rake/testtask'
+Rake::TestTask.new(:test) do |test|
+  test.libs << 'lib' << 'test'
+  test.pattern = 'test/**/test_*.rb'
+  test.verbose = true
 end
 
-#VERSION_FILE = "lib/fluent/version.rb"
-#
-#file VERSION_FILE => ["VERSION"] do |t|
-#  version = File.read("VERSION").strip
-#  File.open(VERSION_FILE, "w") {|f|
-#    f.write <<EOF
-#module Fluent
-#
-#VERSION = '#{version}'
-#
-#end
-#EOF
-#  }
-#end
-#
-#task :default => [VERSION_FILE, :build]
-
-task :default => [:build]
+task :default => :test
