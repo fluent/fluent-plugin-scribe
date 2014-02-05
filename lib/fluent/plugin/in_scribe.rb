@@ -28,6 +28,10 @@ module Fluent
     config_param :remove_newline,  :bool,    :default => false
     config_param :msg_format,      :string,  :default => 'text'
 
+    unless method_defined?(:log)
+      define_method(:log) { $log }
+    end
+
     def initialize
       require 'cgi'
       require 'thrift'
@@ -46,12 +50,13 @@ module Fluent
     end
 
     def start
-      $log.debug "listening scribe on #{@bind}:#{@port}"
+      log.debug "listening scribe on #{@bind}:#{@port}"
 
       handler = FluentScribeHandler.new
       handler.add_prefix = @add_prefix
       handler.remove_newline = @remove_newline
       handler.msg_format = @msg_format
+      handler.logger = log
       processor = Scribe::Processor.new handler
 
       @transport = Thrift::ServerSocket.new @bind, @port
@@ -101,14 +106,15 @@ module Fluent
     def run
       @server.serve
     rescue
-      $log.error "unexpected error", :error=>$!.to_s
-      $log.error_backtrace
+      log.error "unexpected error", :error=>$!.to_s
+      log.error_backtrace
     end
 
     class FluentScribeHandler
       attr_accessor :add_prefix
       attr_accessor :remove_newline
       attr_accessor :msg_format
+      attr_accessor :logger # Use logger instead of log to avoid confusion with Log method
 
       def Log(msgs)
         begin
@@ -122,8 +128,8 @@ module Fluent
           }
           return ResultCode::OK
         rescue => e
-          $log.error "unexpected error", :error=>$!.to_s
-          $log.error_backtrace
+          logger.error "unexpected error", :error=>$!.to_s
+          logger.error_backtrace
           return ResultCode::TRY_LATER
         end
       end

@@ -29,6 +29,10 @@ module Fluent
     config_param :default_category, :string,  :default => 'unknown'
     config_param :format_to_json,   :bool,    :default => false
 
+    unless method_defined?(:log)
+      define_method(:log) { $log }
+    end
+
     def initialize
       require 'thrift'
       $:.unshift File.join(File.dirname(__FILE__), 'thrift')
@@ -102,7 +106,7 @@ module Fluent
           entries << entry
         end
 
-        $log.debug "Writing #{entries.count} entries to scribe"
+        log.debug "Writing #{entries.count} entries to scribe"
         client.Log(entries)
       ensure
         transport.close
