@@ -2,7 +2,7 @@
 
 == Overview
 
-This is a plugin for fluentd[http://fluentd.org] event collector. This plugin adds the Scribe[https://github.com/facebook/scribe] compatible interface to fluentd.
+This is a plugin for fluentd[http://fluentd.org] data collector. This plugin adds the Scribe[https://github.com/facebook/scribe] compatible interface to fluentd.
 
 == What's Scribe?
 
