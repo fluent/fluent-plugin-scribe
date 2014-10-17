@@ -134,7 +134,7 @@ class ScribeInputTest < Test::Unit::TestCase
     d = create_driver(CONFIG + %[
       msg_format json
     ])
-    assert_equal 'json', d.instance.msg_format
+    assert_equal :json, d.instance.msg_format
 
     time = Time.parse("2011-01-02 13:14:15 UTC").to_i
     Fluent::Engine.now = time
@@ -162,7 +162,7 @@ class ScribeInputTest < Test::Unit::TestCase
     d = create_driver(CONFIG + %[
       msg_format url_param
     ])
-    assert_equal 'url_param', d.instance.msg_format
+    assert_equal :url_param, d.instance.msg_format
 
     time = Time.parse("2011-01-02 13:14:15 UTC").to_i
     Fluent::Engine.now = time
