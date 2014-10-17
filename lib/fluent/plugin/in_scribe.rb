@@ -19,6 +19,12 @@ module Fluent
   class ScribeInput < Input
     Plugin.register_input('scribe', self)
 
+    SUPPORTED_FORMAT = {
+      'text' => :text,
+      'json' => :json,
+      'url_param' => :url_param,
+    }
+
     config_param :port,            :integer, :default => 1463
     config_param :bind,            :string,  :default => '0.0.0.0'
     config_param :server_type,     :string,  :default => 'nonblocking'
@@ -26,7 +32,11 @@ module Fluent
     config_param :body_size_limit, :size,    :default => 32*1024*1024  # TODO default
     config_param :add_prefix,      :string,  :default => nil
     config_param :remove_newline,  :bool,    :default => false
-    config_param :msg_format,      :string,  :default => 'text'
+    config_param :msg_format, :default => :text do |val|
+      f = SUPPORTED_FORMAT[val]
+      raise ConfigError, "unsupported msg_format: #{val}" unless f
+      f
+    end
 
     unless method_defined?(:log)
       define_method(:log) { $log }
@@ -64,10 +74,6 @@ module Fluent
         transport_factory = Thrift::FramedTransportFactory.new
       else
         transport_factory = Thrift::BufferedTransportFactory.new
-      end
-
-      unless ['text', 'json', 'url_param'].include? @msg_format
-        raise 'Unknown format: msg_format=#{@msg_format}'
       end
 
       # 2011/09/29 Kazuki Ohta <kazuki.ohta@gmail.com>
@@ -137,17 +143,17 @@ module Fluent
       private
       def create_record(msg)
         case @msg_format
-        when 'text'
+        when :text
           if @remove_newline
             return { 'message' => msg.message.force_encoding('UTF-8').chomp }
           else
             return { 'message' => msg.message.force_encoding('UTF-8') }
           end
-        when 'json'
+        when :json
           js = JSON.parse(msg.message.force_encoding('UTF-8'))
           raise 'body must be a Hash, if json_body=true' unless js.is_a?(Hash)
           return js
-        when 'url_param'
+        when :url_param
           s = msg.message.force_encoding('UTF-8')
           return Hash[ s.split('&').map { |kv|
               k,v = kv.split('=', 2);
