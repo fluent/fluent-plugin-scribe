@@ -105,8 +105,8 @@ module Fluent
 
     def run
       @server.serve
-    rescue
-      log.error "unexpected error", :error=>$!.to_s
+    rescue => e
+      log.error "unexpected error", :error => e.inspect
       log.error_backtrace
     end
 
@@ -128,7 +128,7 @@ module Fluent
           }
           return ResultCode::OK
         rescue => e
-          logger.error "unexpected error", :error=>$!.to_s
+          logger.error "unexpected error", :error => e.inspect
           logger.error_backtrace
           return ResultCode::TRY_LATER
         end
