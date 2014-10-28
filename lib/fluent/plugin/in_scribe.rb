@@ -32,6 +32,7 @@ module Fluent
     config_param :body_size_limit, :size,    :default => 32*1024*1024  # TODO default
     config_param :add_prefix,      :string,  :default => nil
     config_param :remove_newline,  :bool,    :default => false
+    config_param :ignore_invalid_record, :bool, :default => false
     config_param :msg_format, :default => :text do |val|
       f = SUPPORTED_FORMAT[val]
       raise ConfigError, "unsupported msg_format: #{val}" unless f
@@ -44,6 +45,7 @@ module Fluent
 
     def initialize
       require 'cgi'
+      require 'yajl'
       require 'thrift'
       $:.unshift File.join(File.dirname(__FILE__), 'thrift')
       require 'fb303_types'
@@ -66,6 +68,7 @@ module Fluent
       handler.add_prefix = @add_prefix
       handler.remove_newline = @remove_newline
       handler.msg_format = @msg_format
+      handler.ignore_invalid_record = @ignore_invalid_record
       handler.logger = log
       processor = Scribe::Processor.new handler
 
@@ -120,12 +123,25 @@ module Fluent
       attr_accessor :add_prefix
       attr_accessor :remove_newline
       attr_accessor :msg_format
+      attr_accessor :ignore_invalid_record
       attr_accessor :logger # Use logger instead of log to avoid confusion with Log method
 
       def Log(msgs)
         begin
           msgs.each { |msg|
-            record = create_record(msg)
+            begin
+              record = create_record(msg)
+            rescue => e
+              if @ignore_invalid_record
+                # This warning can be disabled by 'log_level error'
+                logger.warn "got invalid record: #{msg}"
+                next
+              else
+                # Keep existence behaviour
+                raise e
+              end
+            end
+
             if @add_prefix
               Engine.emit(@add_prefix + '.' + msg.category, Engine.now, record)
             else
@@ -150,7 +166,7 @@ module Fluent
             return { 'message' => msg.message.force_encoding('UTF-8') }
           end
         when :json
-          js = JSON.parse(msg.message.force_encoding('UTF-8'))
+          js = Yajl.load(msg.message.force_encoding('UTF-8'))
           raise 'body must be a Hash, if json_body=true' unless js.is_a?(Hash)
           return js
         when :url_param

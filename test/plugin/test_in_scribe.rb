@@ -158,6 +158,36 @@ class ScribeInputTest < Test::Unit::TestCase
     shutdown_driver(d)
   end
 
+  data do
+    Fluent::ScribeInput.new
+    {
+      'true'  => [ResultCode::OK, true],
+      'false' => [ResultCode::TRY_LATER, false]
+    }
+  end
+  def test_msg_format_json_with_ignore_invalid_record(data)
+    result, opt = data
+    d = create_driver(CONFIG + %[
+      msg_format json
+      ignore_invalid_record #{opt}
+    ])
+    assert_equal :json, d.instance.msg_format
+    assert_equal opt, d.instance.ignore_invalid_record
+
+    time = Time.parse("2011-01-02 13:14:15 UTC").to_i
+    Fluent::Engine.now = time
+
+    emits = [['tag1', time, '{"a":']]
+    d.run do
+      emits.each { |tag, time, message|
+        res = message_send(tag, message)
+        assert_equal result, res
+      }
+    end
+
+    shutdown_driver(d)
+  end
+
   def test_msg_format_url_param
     d = create_driver(CONFIG + %[
       msg_format url_param
