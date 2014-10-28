@@ -1,3 +1,18 @@
+Release 0.10.13 - 2013/10/29
+* add validation for msg_format
+* use Yajl instead of JSON for parsing record
+* add ignore_invalid_record option to ignore invalid record and return OK to scribed
+
+Release 0.10.12 - 2013/09/04
+* support 'log_level' option
+* fix to do shutdown plugin instance not to duplicate listen
+
+Release 0.10.11 - 2013/09/04
+* add format_to_json bool option with default value false
+
+Release 0.10.10 - 2013/02/06
+* change 'written entries' log level from 'info' to 'debug'
+
 Release 0.10.9 - 2011/05/30
 * overwrite default value of buffer_chunk_limit to 1MB
 * improve memory usage efficiency
