@@ -26,6 +26,7 @@ module Fluent
 
     config_param :remove_prefix,    :string,  :default => nil
     config_param :add_newline,      :bool,    :default => false
+    config_param :ignore_invalid_record, :bool, :default => false
     config_param :default_category, :string,  :default => 'unknown'
     config_param :format_to_json,   :bool,    :default => false
 
@@ -92,7 +93,18 @@ module Fluent
           message = @format_to_json ? record : record[@field_ref]
 
           if message.kind_of?(Array) or message.kind_of?(Hash)
-            message = message.to_json
+            begin
+              message = message.to_json
+            rescue => e
+              if @ignore_invalid_record
+                # This warning can be disabled by 'log_level error'
+                logger.warn "got invalid record: #{msg}"
+                next
+              else
+                # Keep existence behaviour
+                raise e
+              end
+            end
           end
 
           if @add_newline
