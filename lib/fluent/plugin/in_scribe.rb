@@ -127,30 +127,38 @@ module Fluent
       attr_accessor :logger # Use logger instead of log to avoid confusion with Log method
 
       def Log(msgs)
+        bucket = {} # tag -> events(array of [time,record])
+        time_now = Engine.now
         begin
-          msgs.each { |msg|
+          msgs.each do |msg|
             begin
               record = create_record(msg)
             rescue => e
               if @ignore_invalid_record
                 # This warning can be disabled by 'log_level error'
-                logger.warn "got invalid record: #{msg}"
+                logger.warn "got invalid record", message: msg, error_class: e.class, error: e
                 next
-              else
-                # Keep existence behaviour
-                raise e
               end
-            end
 
-            if @add_prefix
-              Engine.emit(@add_prefix + '.' + msg.category, Engine.now, record)
-            else
-              Engine.emit(msg.category, Engine.now, record)
+              raise
             end
-          }
+            tag = @add_prefix ? @add_prefix + '.' + msg.category : msg.category
+            bucket[tag] ||= []
+            bucket[tag].push([time_now,record])
+          end
+        rescue => e
+          logger.error "unexpected error", error_class: e.class, error: e
+          logger.error_backtrace
+          return ResultCode::TRY_LATER
+        end
+
+        begin
+          bucket.each do |tag,events|
+            Engine.emit_array(tag, events)
+          end
           return ResultCode::OK
         rescue => e
-          logger.error "unexpected error", :error => e.inspect
+          logger.error "unexpected error", error_class: e.class, error: e
           logger.error_backtrace
           return ResultCode::TRY_LATER
         end
