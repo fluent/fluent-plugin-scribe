@@ -98,11 +98,11 @@ module Fluent
             rescue => e
               if @ignore_invalid_record
                 # This warning can be disabled by 'log_level error'
-                logger.warn "got invalid record: #{msg}"
+                logger.warn "got invalid record: #{message}"
                 next
               else
                 # Keep existence behaviour
-                raise e
+                raise
               end
             end
           end
