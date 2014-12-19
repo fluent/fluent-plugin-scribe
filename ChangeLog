@@ -1,9 +1,13 @@
-Release 0.10.13 - 2013/10/29
+Release 0.10.14 - 2014/12/19
+* add ignore_invalid_record to out_scribe
+* improve input performance by reducing the times of emit
+
+Release 0.10.13 - 2014/10/29
 * add validation for msg_format
 * use Yajl instead of JSON for parsing record
 * add ignore_invalid_record option to ignore invalid record and return OK to scribed
 
-Release 0.10.12 - 2013/09/04
+Release 0.10.12 - 2014/09/04
 * support 'log_level' option
 * fix to do shutdown plugin instance not to duplicate listen
 
