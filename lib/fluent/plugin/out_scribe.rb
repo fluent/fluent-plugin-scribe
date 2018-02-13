@@ -34,6 +34,10 @@ module Fluent
       define_method(:log) { $log }
     end
 
+    def multi_workers_ready?
+      true
+    end
+
     def initialize
       require 'thrift'
       $:.unshift File.join(File.dirname(__FILE__), 'thrift')
