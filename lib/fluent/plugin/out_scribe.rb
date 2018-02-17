@@ -92,6 +92,7 @@ module Fluent
 
         chunk.msgpack_each do |arr|
           tag, record = arr
+          next if record == nil
           next unless @format_to_json || record.has_key?(@field_ref)
 
           message = @format_to_json ? record : record[@field_ref]
