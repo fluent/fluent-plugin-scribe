@@ -1,3 +1,6 @@
+Release 1.0.0 - 2018/12/11
+* Use fluentd v1 API
+
 Release 0.10.14 - 2014/12/19
 * add ignore_invalid_record to out_scribe
 * improve input performance by reducing the times of emit

@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-scribe"
-  gem.version       = "0.10.14"
+  gem.version       = "1.0.0"
 
   gem.authors       = ["Kazuki Ohta", "TAGOMORI Satoshi"]
   gem.email         = ["kazuki.ohta@gmail.com", "tagomoris@gmail.com"]
