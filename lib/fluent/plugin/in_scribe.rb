@@ -15,8 +15,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
+require 'fluent/plugin/input'
+
 module Fluent
-  class ScribeInput < Input
+  class ScribeInput < ::Fluent::Plugin::Input
     Plugin.register_input('scribe', self)
 
     SUPPORTED_FORMAT = {
@@ -70,6 +73,7 @@ module Fluent
       handler.msg_format = @msg_format
       handler.ignore_invalid_record = @ignore_invalid_record
       handler.logger = log
+      handler.router = router
       processor = Scribe::Processor.new handler
 
       @transport = Thrift::ServerSocket.new @bind, @port
@@ -125,6 +129,7 @@ module Fluent
       attr_accessor :msg_format
       attr_accessor :ignore_invalid_record
       attr_accessor :logger # Use logger instead of log to avoid confusion with Log method
+      attr_accessor :router
 
       def Log(msgs)
         bucket = {} # tag -> events(array of [time,record])
@@ -154,7 +159,7 @@ module Fluent
 
         begin
           bucket.each do |tag,events|
-            Engine.emit_array(tag, events)
+            router.emit_array(tag, events)
           end
           return ResultCode::OK
         rescue => e
