@@ -34,6 +34,10 @@ module Fluent
       define_method(:log) { $log }
     end
 
+    def multi_workers_ready?
+      true
+    end
+
     def initialize
       require 'thrift'
       $:.unshift File.join(File.dirname(__FILE__), 'thrift')
@@ -88,6 +92,7 @@ module Fluent
 
         chunk.msgpack_each do |arr|
           tag, record = arr
+          next if record == nil
           next unless @format_to_json || record.has_key?(@field_ref)
 
           message = @format_to_json ? record : record[@field_ref]
