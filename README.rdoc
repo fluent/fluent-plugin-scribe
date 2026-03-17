@@ -1,5 +1,9 @@
 = Scribe input plugin for Fluentd[http://fluentd.org/]
 
+Scribe[https://github.com/facebookarchive/scribe] project was already archived since Jan 13, 2022.
+That is no longer supported or updated by Facebook.
+This repository has been archived and will be kept read-only for historical purposes.
+
 == Overview
 
 This is a plugin for fluentd[http://fluentd.org] data collector. This plugin adds the Scribe[https://github.com/facebook/scribe] compatible interface to fluentd.
